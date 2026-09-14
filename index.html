@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ตามสั่ง ตามใจ - TamSang TamJai</title>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --text-main: #f8fafc;
+            --text-sub: #94a3b8;
+            --accent: #38bdf8;
+            --accent-glow: rgba(56, 189, 248, 0.3);
+            --border: #334155;
+            --success: #22c55e;
+            --danger: #ef4444;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Kanit', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-bottom: 80px;
+        }
+
+        header {
+            width: 100%;
+            text-align: center;
+            padding: 1.5rem 1rem;
+            background: linear-gradient(180deg, rgba(15,23,42,1) 0%, rgba(30,41,59,0.8) 100%);
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            backdrop-filter: blur(10px);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-left: 2rem;
+            padding-right: 2rem;
+        }
+
+        .header-title h1 {
+            font-size: 1.8rem;
+            color: var(--accent);
+            text-shadow: 0 0 10px var(--accent-glow);
+        }
+
+        .header-title p {
+            color: var(--text-sub);
+            font-size: 0.85rem;
+        }
+
+        /* Cart Trigger Button */
+        .cart-trigger {
+            background: rgba(56, 189, 248, 0.1);
+            border: 1px solid var(--accent);
+            color: var(--accent);
+            padding: 0.6rem 1.2rem;
+            border-radius: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .cart-trigger:hover {
+            background: var(--accent);
+            color: #0f172a;
+            box-shadow: 0 0 15px var(--accent-glow);
+        }
+
+        .cart-badge {
+            background-color: var(--danger);
+            color: white;
+            font-size: 0.75rem;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            padding: 1.5rem;
+        }
+
+        /* Screen Management */
+        .screen {
+            display: none;
+        }
+        .screen.active {
+            display: block;
+        }
+
+        /* Form Screen */
+        .card-form {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 2rem;
+            max-width: 450px;
+            margin: 3rem auto;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+        }
+
+        .form-group {
+            margin-bottom: 1.2rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--text-sub);
+            font-size: 0.9rem;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            background-color: #0f172a;
+            color: #fff;
+            font-size: 1rem;
+            outline: none;
+        }
+
+        .form-group input:focus, .form-group select:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 8px var(--accent-glow);
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 1rem;
+            border: none;
+            border-radius: 8px;
+            background: linear-gradient(135deg, #0284c7, #38bdf8);
+            color: white;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 1rem;
+        }
+
+        .btn-submit:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px var(--accent-glow);
+        }
+
+        /* User Info Bar */
+        .user-bar {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border);
+            padding: 1rem;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            font-size: 0.95rem;
+        }
+
+        .user-bar span {
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        /* Menu Grid */
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .menu-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .menu-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--accent);
+            box-shadow: 0 8px 20px var(--accent-glow);
+        }
+
+        .menu-card img {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+        }
+
+        .menu-info {
+            padding: 1.2rem;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+        }
+
+        .badge {
+            align-self: flex-start;
+            padding: 0.3rem 0.6rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .badge-green { background: rgba(34, 197, 94, 0.2); color: #4ade80; border: 1px solid #22c55e; }
+        .badge-yellow { background: rgba(234, 179, 8, 0.2); color: #facc15; border: 1px solid #eab308; }
+        .badge-blue { background: rgba(59, 130, 246, 0.2); color: #60a5fa; border: 1px solid #3b82f6; }
+        .badge-purple { background: rgba(168, 85, 247, 0.2); color: #c084fc; border: 1px solid #a855f7; }
+
+        .menu-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.3rem;
+        }
+
+        .menu-subtitle {
+            font-size: 0.85rem;
+            color: var(--text-sub);
+            margin-bottom: 1rem;
+            flex-grow: 1;
+        }
+
+        .menu-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .menu-price {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--accent);
+        }
+
+        .btn-add-quick {
+            background-color: var(--accent);
+            color: #0f172a;
+            border: none;
+            padding: 0.4rem 0.8rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .btn-add-quick:hover {
+            background-color: #7dd3fc;
+        }
+
+        /* Modal Popup */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.8);
+            backdrop-filter: blur(5px);
+            z-index: 100;
+            justify-content: center;
+            align-items: center;
+            padding: 1rem;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            max-width: 600px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 1.8rem;
+            color: #fff;
+            cursor: pointer;
+            z-index: 10;
+            background: rgba(0,0,0,0.5);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-img {
+            width: 100%;
+            height: 300px;
+            object-fit: cover;
+        }
+
+        .modal-body {
+            padding: 1.5rem;
+        }
+
+        .modal-section-title {
+            font-size: 1rem;
+            color: var(--accent);
+            margin-top: 1.2rem;
+            margin-bottom: 0.5rem;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 0.3rem;
+        }
+
+        .modal-list {
+            list-style: none;
+            font-size: 0.9rem;
+            color: var(--text-sub);
+        }
+
+        .modal-list li {
+            margin-bottom: 0.4rem;
+            position: relative;
+            padding-left: 1.2rem;
+        }
+
+        .modal-list li::before {
+            content: "•";
+            color: var(--accent);
+            position: absolute;
+            left: 0;
+            font-weight: bold;
+        }
+
+        .order-btn {
+            width: 100%;
+            padding: 0.8rem;
+            margin-top: 1.5rem;
+            background-color: var(--success);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .order-btn:hover {
+            background-color: #16a34a;
+        }
+
+        /* Cart Drawer / Modal */
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.8rem 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .cart-item-details {
+            flex-grow: 1;
+        }
+
+        .cart-item-name {
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .cart-item-price {
+            color: var(--accent);
+            font-size: 0.85rem;
+        }
+
+        .cart-controls {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .cart-btn-qty {
+            background: var(--border);
+            color: white;
+            border: none;
+            width: 26px;
+            height: 26px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .cart-btn-qty:hover {
+            background: var(--accent);
+            color: #0f172a;
+        }
+
+        .cart-summary {
+            margin-top: 1.5rem;
+            border-top: 2px dashed var(--border);
+            padding-top: 1rem;
+        }
+
+        .cart-total {
+            display: flex;
+            justify-content: space-between;
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--accent);
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="header-title">
+            <h1>ตามสั่ง ตามใจ</h1>
+            <p>TamSang TamJai — Futuristic Culinary Experience</p>
+        </div>
+        <button class="cart-trigger" id="cart-btn" onclick="openCartModal()" style="display: none;">
+            🛒 ตะกร้าของฉัน
+            <span class="cart-badge" id="cart-count">0</span>
+        </button>
+    </header>
+
+    <div class="container">
+        
+        <!-- STEP 1: LOGIN FORM -->
+        <div id="login-screen" class="screen active">
+            <div class="card-form">
+                <h2 style="text-align: center; margin-bottom: 1.5rem;">เช็คอินเข้าโต๊ะ</h2>
+                <form id="checkin-form">
+                    <div class="form-group">
+                        <label for="cust-name">ชื่อของคุณ</label>
+                        <input type="text" id="cust-name" required placeholder="กรอกชื่อของคุณ">
+                    </div>
+                    <div class="form-group">
+                        <label for="cust-phone">เบอร์โทรศัพท์</label>
+                        <input type="tel" id="cust-phone" required placeholder="09X-XXX-XXXX">
+                    </div>
+                    <div class="form-group">
+                        <label for="cust-table">โต๊ะ / ที่นั่ง</label>
+                        <select id="cust-table" required>
+                            <option value="">-- เลือกหมายเลขโต๊ะ --</option>
+                            <option value="Table 01">โต๊ะ 01</option>
+                            <option value="Table 02">โต๊ะ 02</option>
+                            <option value="Table 03">โต๊ะ 03</option>
+                            <option value="Table 04">โต๊ะ 04</option>
+                            <option value="VIP Cyber Zone">VIP Cyber Zone</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn-submit">เริ่มสั่งอาหาร</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- STEP 2: MENU LISTING -->
+        <div id="menu-screen" class="screen">
+            <div class="user-bar">
+                <div>ลูกค้า: <span id="display-name">-</span></div>
+                <div>เบอร์โทร: <span id="display-phone">-</span></div>
+                <div>ที่นั่ง: <span id="display-table">-</span></div>
+            </div>
+
+            <div class="menu-grid" id="menu-grid">
+                <!-- Data populated dynamically via JS -->
+            </div>
+        </div>
+
+    </div>
+
+    <!-- MODAL 1: MENU DETAIL -->
+    <div class="modal" id="menu-modal">
+        <div class="modal-content">
+            <span class="modal-close" onclick="closeModal('menu-modal')">&times;</span>
+            <img id="modal-img" class="modal-img" src="" alt="Food Image">
+            <div class="modal-body">
+                <span id="modal-badge" class="badge">Badge</span>
+                <h2 id="modal-title" style="margin-top: 0.5rem;">Title</h2>
+                <p id="modal-subtitle" style="color: var(--text-sub); font-size: 0.9rem;"></p>
+                <div id="modal-price" class="menu-price" style="margin-top: 0.5rem;">0 THB</div>
+
+                <div class="modal-section-title">ส่วนผสมหลัก (Ingredients)</div>
+                <ul id="modal-ingredients" class="modal-list"></ul>
+
+                <div class="modal-section-title">ข้อมูลทางสุขภาพ (Health & Nutrition)</div>
+                <ul id="modal-health" class="modal-list"></ul>
+
+                <button class="order-btn" id="btn-add-to-cart">เพิ่มลงตะกร้า</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 2: CART VIEW -->
+    <div class="modal" id="cart-modal">
+        <div class="modal-content">
+            <span class="modal-close" onclick="closeModal('cart-modal')">&times;</span>
+            <div class="modal-body">
+                <h2 style="margin-bottom: 1rem; color: var(--accent);">🛒 รายการที่เลือกสั่ง</h2>
+                <div id="cart-items-container">
+                    <!-- Cart items rendered via JS -->
+                </div>
+
+                <div class="cart-summary">
+                    <div class="cart-total">
+                        <span>ราคารวมทั้งหมด:</span>
+                        <span id="cart-total-price">0 THB</span>
+                    </div>
+                    <button class="order-btn" onclick="submitOrder()">ยืนยันการส่งออเดอร์ไปยังห้องครัว</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global State
+        let cart = [];
+        let selectedMenuIndex = null;
+
+        // Menu Data
+        const menuItems = [
+            {
+                id: "01",
+                name: "The Matrix Krapow",
+                sub: "กะเพราเนื้อวากิวออสเตรเลีย + ไข่ดาวลาวาซูวีด์",
+                price: 289,
+                badge: "Build Muscle",
+                badgeClass: "badge-green",
+                img: "Gemini_Generated_Image_yhg52hyhg52hyhg5.jpg",
+                ingredients: [
+                    "เนื้อวากิว A5/Australian",
+                    "ใบกะเพราควอนตัมกรอบ",
+                    "ไข่เป็ดซูวีด์ 63.5°C",
+                    "เม็ดคาเวียร์พริกน้ำปลา",
+                    "ข้าวหอมมะลิออร์แกนิก (Option: เปลี่ยนเป็นข้าวบุกได้)"
+                ],
+                health: [
+                    "Calories: 620 kcal",
+                    "Protein: 42g"
+                ]
+            },
+            {
+                id: "02",
+                name: "Cyberpunk Pad Thai",
+                sub: "ผัดไทยเส้นบุกอิตาเลียนซอสต้มยำมันกุ้ง",
+                price: 245,
+                badge: "Low GI / Weight Control",
+                badgeClass: "badge-yellow",
+                img: "Gemini_Generated_Image_6a0wnw6a0wnw6a0w.jpg",
+                ingredients: [
+                    "เส้นบุก Fusilli Konjac",
+                    "กุ้งแม่น้ำเผา",
+                    "ซอสต้มยำมันกุ้งเคี่ยว 8 ชม.",
+                    "ถั่วลิสงคั่วบด & เต้าหู้โมเมน"
+                ],
+                health: [
+                    "Calories: 380 kcal",
+                    "Carbs: 12g (Ultra Low-Carb)"
+                ]
+            },
+            {
+                id: "03",
+                name: "Algorithm Clean Bowl",
+                sub: "ข้าวผัดไรซ์เบอร์รีแซลมอนซูเปอร์ฟู้ด",
+                price: 260,
+                badge: "Heart Health",
+                badgeClass: "badge-blue",
+                img: "Gemini_Generated_Image_9945109945109945.jpg",
+                ingredients: [
+                    "ข้าวไรซ์เบอร์รีอินทรีย์",
+                    "แซลมอนนอร์เวย์ย่างเตาถ่าน",
+                    "อะโวคาโดฮัสส์ & เมล็ดฟักทอง",
+                    "ดอกไม้กินได้ (Edible Flowers)"
+                ],
+                health: [
+                    "Calories: 490 kcal",
+                    "Healthy Fats: 18g (Omega-3)"
+                ]
+            },
+            {
+                id: "04",
+                name: "The Bug-Free Tom Yum",
+                sub: "ต้มยำกุ้งแห้ง Espresso Shot + ข้าวไข่ขยี้",
+                price: 195,
+                badge: "Immunity Booster",
+                badgeClass: "badge-purple",
+                img: "Gemini_Generated_Image_pbtmeypbtmeypbtm.jpg",
+                ingredients: [
+                    "ซุปต้มยำสกัดเข้มข้น (Consommé)",
+                    "ไข่ไก่ Cage-Free",
+                    "มันกุ้งแม่น้ำ & ข้าวหอมมะลิ"
+                ],
+                health: [
+                    "Calories: 510 kcal",
+                    "Sodium: Controlled (-40%)"
+                ]
+            },
+            {
+                id: "05",
+                name: "404 Krapow Not Found",
+                sub: "กะเพราล่องหน (404 Krapow Not Found)",
+                price: 320,
+                badge: "Zero-Waste & Low Fat",
+                badgeClass: "badge-green",
+                img: "Gemini_Generated_Image_tmgj49tmgj49tmgj.jpg",
+                ingredients: [
+                    "เนื้อวากิว A5 สกัด",
+                    "แผ่นฟิล์มกะเพราสกัดใส (Edible Sheet)",
+                    "ข้าวหอมมะลิอบมะลิ & ซุปดิปโชยุ"
+                ],
+                health: [
+                    "Calories: 510 kcal",
+                    "Protein: High Protein"
+                ]
+            },
+            {
+                id: "06",
+                name: "Binary Code Green Curry",
+                sub: "แกงเขียวหวานรหัส 01",
+                price: 260,
+                badge: "High-Nutrient Aesthetic",
+                badgeClass: "badge-purple",
+                img: "Gemini_Generated_Image_rkajq0rkajq0rkaj.jpg",
+                ingredients: [
+                    "อกไก่ซูวีด์ทรง Cube",
+                    "พานาคอตต้าแกงเขียวหวานเข้มข้น",
+                    "มะเขือยาวอบกรอบ & ข้าวไรซ์เบอร์รีอัดแท่ง"
+                ],
+                health: [
+                    "Calories: 430 kcal",
+                    "Portion: Precision Macro"
+                ]
+            },
+            {
+                id: "07",
+                name: "Glitch Pad Thai",
+                sub: "ผัดไทย กลิตช์ รสชาติข้ามมิติ",
+                price: 240,
+                badge: "Flavor-Changing Magic",
+                badgeClass: "badge-yellow",
+                img: "Gemini_Generated_Image_cthmt9cthmt9cthm.jpg",
+                ingredients: [
+                    "เส้นจันทน์เหนียวนุ่ม",
+                    "Micro-Flavor Capsules (ซอสหม่าล่า)",
+                    "กุ้งแชบ๊วย & ซอสมันกุ้งเคี่ยว"
+                ],
+                health: [
+                    "Calories: 520 kcal",
+                    "Fiber: High Fiber Boost"
+                ]
+            }
+        ];
+
+        // Form Submit Handler
+        document.getElementById('checkin-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const name = document.getElementById('cust-name').value;
+            const phone = document.getElementById('cust-phone').value;
+            const table = document.getElementById('cust-table').value;
+
+            document.getElementById('display-name').innerText = name;
+            document.getElementById('display-phone').innerText = phone;
+            document.getElementById('display-table').innerText = table;
+
+            document.getElementById('login-screen').classList.remove('active');
+            document.getElementById('menu-screen').classList.add('active');
+            document.getElementById('cart-btn').style.display = 'flex';
+
+            renderMenu();
+        });
+
+        // Render Menu Cards
+        function renderMenu() {
+            const grid = document.getElementById('menu-grid');
+            grid.innerHTML = '';
+
+            menuItems.forEach((item, index) => {
+                const card = document.createElement('div');
+                card.className = 'menu-card';
+
+                card.innerHTML = `
+                    <img src="${item.img}" alt="${item.name}" onclick="openModal(${index})">
+                    <div class="menu-info">
+                        <span class="badge ${item.badgeClass}">${item.badge}</span>
+                        <div class="menu-title" onclick="openModal(${index})">${item.id}. ${item.name}</div>
+                        <div class="menu-subtitle" onclick="openModal(${index})">${item.sub}</div>
+                        <div class="menu-footer">
+                            <div class="menu-price">${item.price} THB</div>
+                            <button class="btn-add-quick" onclick="addToCart(${index}); event.stopPropagation();">+ ใส่ตะกร้า</button>
+                        </div>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        // Detail Modal Functions
+        function openModal(index) {
+            selectedMenuIndex = index;
+            const item = menuItems[index];
+            document.getElementById('modal-img').src = item.img;
+            document.getElementById('modal-badge').className = `badge ${item.badgeClass}`;
+            document.getElementById('modal-badge').innerText = item.badge;
+            document.getElementById('modal-title').innerText = `${item.id}. ${item.name}`;
+            document.getElementById('modal-subtitle').innerText = item.sub;
+            document.getElementById('modal-price').innerText = `${item.price} THB`;
+
+            const ingList = document.getElementById('modal-ingredients');
+            ingList.innerHTML = item.ingredients.map(ing => `<li>${ing}</li>`).join('');
+
+            const healthList = document.getElementById('modal-health');
+            healthList.innerHTML = item.health.map(h => `<li>${h}</li>`).join('');
+
+            document.getElementById('btn-add-to-cart').onclick = function() {
+                addToCart(index);
+                closeModal('menu-modal');
+            };
+
+            document.getElementById('menu-modal').classList.add('active');
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+        }
+
+        // Cart Logic
+        function addToCart(index) {
+            const item = menuItems[index];
+            const existing = cart.find(c => c.id === item.id);
+            if (existing) {
+                existing.qty += 1;
+            } else {
+                cart.push({ ...item, qty: 1 });
+            }
+            updateCartUI();
+        }
+
+        function updateQuantity(id, change) {
+            const item = cart.find(c => c.id === id);
+            if (item) {
+                item.qty += change;
+                if (item.qty <= 0) {
+                    cart = cart.filter(c => c.id !== id);
+                }
+            }
+            updateCartUI();
+            renderCartModal();
+        }
+
+        function updateCartUI() {
+            const totalCount = cart.reduce((sum, item) => sum + item.qty, 0);
+            document.getElementById('cart-count').innerText = totalCount;
+        }
+
+        function openCartModal() {
+            renderCartModal();
+            document.getElementById('cart-modal').classList.add('active');
+        }
+
+        function renderCartModal() {
+            const container = document.getElementById('cart-items-container');
+            container.innerHTML = '';
+
+            if (cart.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: var(--text-sub); padding: 2rem 0;">ยังไม่มีรายการในตะกร้า</p>';
+                document.getElementById('cart-total-price').innerText = '0 THB';
+                return;
+            }
+
+            let totalPrice = 0;
+
+            cart.forEach(item => {
+                const itemTotal = item.price * item.qty;
+                totalPrice += itemTotal;
+
+                const div = document.createElement('div');
+                div.className = 'cart-item';
+                div.innerHTML = `
+                    <div class="cart-item-details">
+                        <div class="cart-item-name">${item.name}</div>
+                        <div class="cart-item-price">${item.price} THB x ${item.qty} = ${itemTotal} THB</div>
+                    </div>
+                    <div class="cart-controls">
+                        <button class="cart-btn-qty" onclick="updateQuantity('${item.id}', -1)">-</button>
+                        <span>${item.qty}</span>
+                        <button class="cart-btn-qty" onclick="updateQuantity('${item.id}', 1)">+</button>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+
+            document.getElementById('cart-total-price').innerText = `${totalPrice} THB`;
+        }
+
+        function submitOrder() {
+            if (cart.length === 0) {
+                alert('กรุณาเลือกรายการอาหารก่อนส่งออเดอร์');
+                return;
+            }
+            const name = document.getElementById('display-name').innerText;
+            const table = document.getElementById('display-table').innerText;
+            alert(`ขอบคุณครับคุณ ${name} (${table})\nทางร้านได้รับออเดอร์เรียบร้อยแล้ว!`);
+            cart = [];
+            updateCartUI();
+            closeModal('cart-modal');
+        }
+    </script>
+</body>
+</html>
